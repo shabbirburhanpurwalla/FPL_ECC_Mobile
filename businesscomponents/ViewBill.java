@@ -89,7 +89,7 @@ public class ViewBill extends ReusableLibrary{
 					commonFunction.getData(properties.getProperty("Environment"),"General_Data", "SelectAnotherAccount","Select Another Account URL",true),
 					ViewBillPageObjects.lnk_SelectAnotherAccount.getObjectName()
 					);		
-		Thread.sleep(8000);
+		
 		//Verify customer name is displayed
 		getPageElement(ViewBillPageObjects.lbl_CustomerName);	
 		
@@ -133,11 +133,11 @@ public class ViewBill extends ReusableLibrary{
 			}
 		}
 		
-		//Contact Us Link		
+		/*//Contact Us Link		
 		commonFunction.clickAndVerifyUrl(getPageElement(ViewBillPageObjects.lnk_ContactUs),
 				commonFunction.getData(properties.getProperty("Environment"),"General_Data", "Contact_Us_Link","Contact Us Link",true),
 				ViewBillPageObjects.lnk_ContactUs.getObjectName()
-				);
+				);*/
 		
 		/*//Email Update Link		
 		commonFunction.clickAndVerifyUrl(getPageElement(ViewBillPageObjects.lnk_EmailUpdate),
@@ -161,6 +161,7 @@ public class ViewBill extends ReusableLibrary{
 	 */
 	
 	public void verifyBalanceBannerSection() throws IOException, InterruptedException{
+		String environment = properties.getProperty("Environment");
 		String customerName = commonFunction.getData("Accounts", "CustomerName", "Customer Name",true);
 		String dueDate = commonFunction.getData("Accounts", "DueDate","", false);
 		String pastDueAmount = commonFunction.getData("Accounts", "PastDueAmount","",false);		
@@ -249,11 +250,15 @@ public class ViewBill extends ReusableLibrary{
 								commonFunction.getData(properties.getProperty("Environment"),"General_Data", "PayBillImage","PayBill Image URL",true),
 								ViewBillPageObjects.lnk_PayBillblueBand.getObjectName());
 						
-						//Click and Verify URL
-					   commonFunction.clickAndVerifyUrl(getPageElement(ViewBillPageObjects.lnk_PayBillblueBand1),
+						//Click and Verify URL - Not Working - Instead checking href attribute
+					   /*commonFunction.clickAndVerifyUrl(getPageElement(ViewBillPageObjects.lnk_PayBillblueBand1),
 								commonFunction.getData(properties.getProperty("Environment"),"General_Data", "POL_Link","PayBill URL",true),
 								"Pay Bill Link"
-								);
+								);*/
+						
+						commonFunction.compareText(commonFunction.getData(environment,"General_Data", "POL_Link","PayBill URL",true), 
+								getPageElement(ViewBillPageObjects.lnk_PayBillblueBand1).getAttribute("href"),
+								ViewBillPageObjects.lnk_PayBillblueBand1.getObjectName()+" verification");
 					}
 			}
 		}
@@ -302,12 +307,12 @@ public class ViewBill extends ReusableLibrary{
 					ViewBillPageObjects.lnl_ViewAccountSummary.getObjectName()
 					);
 		
-		//Verify View Bill Insert Link		
+		/*//Verify View Bill Insert Link		
 		if(commonFunction.isElementPresent(ViewBillPageObjects.lnk_ViewBillInsert.getLocatorType().toString(), 
 				ViewBillPageObjects.lnk_ViewBillInsert.getProperty(), ViewBillPageObjects.lnk_ViewBillInsert.getObjectName(),true))				
 			commonFunction.verifyLinkInWebPage(getPageElement(ViewBillPageObjects.lnk_ViewBillInsert),ViewBillPageObjects.lnk_ViewBillInsert.getObjectName(),
 					commonFunction.getData(properties.getProperty("Environment"),"General_Data", "ViewBillInsert","ViewBillInsert URL",true));					
-					
+		*/			
 		
 		//Verify Customer Name
 		String customerName = commonFunction.getData("Accounts", "CustomerName", "Customer Name",true);
@@ -332,26 +337,33 @@ public class ViewBill extends ReusableLibrary{
 			Select dropdown = new Select(getPageElement(ViewBillPageObjects.drpdwn_ServiceDate));
 			int billCount = dropdown.getOptions().size();
 			
-			getPageElement(ViewBillPageObjects.drpdwn_ServiceDate).click();
+			//getPageElement(ViewBillPageObjects.drpdwn_ServiceDate).click();
 			report.updateTestLog("'Service Date' dropdown", billCount +" previous bills displayed", Status.PASS);
 			if(billCount>1){
-				//String billDate = "03/03/2014"; // Get data from data tables*************************************use commonFunction.getData()
 				String billDate = commonFunction.getData("Accounts", "PreviousBillDate", "Previous Bill Date", false);
-				billDate = commonFunction.convertDatetoSingleDigit(billDate);
-				
-				SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
-				Date date = formatter.parse(billDate);
-				String formattedDate = new SimpleDateFormat("MM/dd/yyyy").format(date);
-				try{
-					dropdown.selectByValue(formattedDate);
-					Thread.sleep(7000);
-					//Select second bill
-					report.updateTestLog("Select Bill", "Bill dated "+ billDate + " selected successfully.", Status.PASS);
-					commonFunction.compareText("Statement balance as of " + billDate, getPageElement(ViewBillPageObjects.lbl_StatementBalance).getText(), "Statement Balance Updation");
-					}catch(Exception e){
-						report.updateTestLog("Select Bill from Service Date Dropdown", "Error selecting bill from Service Date dropdown", Status.FAIL);
-					}
+				if(!billDate.isEmpty()){
+						billDate = commonFunction.convertDatetoSingleDigit(billDate);
+					
+					SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
+					Date date = formatter.parse(billDate);
+					String formattedDate = new SimpleDateFormat("MM/dd/yyyy").format(date);
+					try{
+						dropdown.selectByValue(formattedDate);
+						Thread.sleep(7000);
+						//Select second bill
+						report.updateTestLog("Select Bill", "Bill dated "+ billDate + " selected successfully.", Status.PASS);
+						commonFunction.compareText("Statement balance as of " + billDate, getPageElement(ViewBillPageObjects.lbl_StatementBalance).getText(), "Statement Balance Updation");
+						
+						
+						//dropdown.selectByValue("04/01/2014");					
+						//Thread.sleep(7000);
+						//report.updateTestLog("Select Bill", "Bill dated "+ billDate + " selected again.", Status.PASS);
+						//commonFunction.compareText("Statement balance as of " + billDate, getPageElement(ViewBillPageObjects.lbl_StatementBalance).getText(), "Statement Balance Updation");
+						}catch(Exception e){
+							report.updateTestLog("Select Bill from Service Date Dropdown", "Error selecting bill dated "+ formattedDate +" from Service Date dropdown", Status.FAIL);
+						}
 			}
+		  }
 		}
 		
 		//Click New Charges Section
@@ -361,7 +373,7 @@ public class ViewBill extends ReusableLibrary{
 				ViewBillPageObjects.lbl_NewChargesHeader.getObjectName());
 		
 		
-		//Click Download Bill Link
+	/*	//Click Download Bill Link
 		if(commonFunction.isElementPresent(ViewBillPageObjects.lnk_DownloadBill.getLocatorType().toString(),
 				ViewBillPageObjects.lnk_DownloadBill.getProperty(), ViewBillPageObjects.lnk_DownloadBill.getObjectName(), true)){
 			
@@ -369,18 +381,19 @@ public class ViewBill extends ReusableLibrary{
 					commonFunction.getData(properties.getProperty("Environment"),"General_Data", "DownloadBillImageURL","DownloadBill Image URL",true),
 					ViewBillPageObjects.lnk_DownloadBill.getObjectName());
 			
-				//downloadBill(ViewBillPageObjects.lnk_DownloadBill, ViewBillPageObjects.lnk_DownloadBill.getObjectName());
-		}
+				downloadBill(ViewBillPageObjects.lnk_DownloadBill, ViewBillPageObjects.lnk_DownloadBill.getObjectName());
+		}*/
 		
 		//Retrieve Data from Accounts sheet
 		String abpDate = commonFunction.getData("Accounts", "ABPDate","ABP Date",false);
 		
 		if(!abpDate.isEmpty()){
 			String abpMessage = "DO NOT PAY. Thank you for using FPL Automatic Bill Pay®. The amount due on your account will be drafted automatically on or after "+ abpDate+".";
-			commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ABPMessage.getLocatorType().toString(),
-					ViewBillPageObjects.lbl_ABPMessage.getProperty(),ViewBillPageObjects.lbl_ABPMessage.getObjectName());
-			commonFunction.compareText(abpMessage, getPageElement(ViewBillPageObjects.lbl_ABPMessage).getText(), 
-					ViewBillPageObjects.lbl_ABPMessage.getObjectName());			
+			if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ABPMessage.getLocatorType().toString(),
+					ViewBillPageObjects.lbl_ABPMessage.getProperty(),ViewBillPageObjects.lbl_ABPMessage.getObjectName())){
+				commonFunction.compareText(abpMessage, getPageElement(ViewBillPageObjects.lbl_ABPMessage).getText(), 
+						ViewBillPageObjects.lbl_ABPMessage.getObjectName());
+			}
 		}
 		
 		//Pay Bill Button
@@ -411,6 +424,7 @@ public class ViewBill extends ReusableLibrary{
 		else
 			commonFunction.verifyIsElementNotPresent(ViewBillPageObjects.lnk_PayBill.getProperty(),ViewBillPageObjects.lnk_PayBill.getLocatorType().toString(),
 					ViewBillPageObjects.lnk_PayBill.getObjectName());
+			
 	}
 	 
 	/*************************************************************
@@ -459,7 +473,14 @@ public class ViewBill extends ReusableLibrary{
 	public void checkAccountHistory() throws InterruptedException
 	{
 		action.sendKeys(Keys.HOME).perform();
-		action.sendKeys(Keys.PAGE_DOWN).perform();
+		//action.sendKeys(Keys.PAGE_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		action.sendKeys(Keys.ARROW_DOWN).perform();
+		
 		//Verify if Your Bills section is selected by default		    
 		if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lnk_Yourbills.getLocatorType().toString(),
 				ViewBillPageObjects.lnk_Yourbills.getProperty(),ViewBillPageObjects.lnk_Yourbills.getObjectName())){
@@ -526,11 +547,11 @@ public class ViewBill extends ReusableLibrary{
 			if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.img_AmiLegend.getLocatorType().toString(),
 					ViewBillPageObjects.img_AmiLegend.getProperty(),ViewBillPageObjects.img_AmiLegend.getObjectName())){
 				
-				/*//Verify correct legend is displayed
+			/*	//Verify correct legend is displayed
 				commonFunction.verifyImageSource(getPageElement(ViewBillPageObjects.img_AmiLegend),
 						commonFunction.getData(environment,"General_Data", "AMIImageUrl","AMI Legend Image URL",true),
-						ViewBillPageObjects.img_AmiLegend.getObjectName());*/
-				
+						ViewBillPageObjects.img_AmiLegend.getObjectName());
+				*/
 			}
 			//Verify AMI Message
 			if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_AmiMessage.getLocatorType().toString(),
@@ -1129,6 +1150,7 @@ public class ViewBill extends ReusableLibrary{
 				
 		}
 		action.sendKeys(Keys.END).perform();
+		Thread.sleep(1000);
 	}
 	
 	/***********************************************************
@@ -1138,6 +1160,7 @@ public class ViewBill extends ReusableLibrary{
 	 * ***********************************************************
 	 */
 	private void verifyResidentialCenterPromoMessage() throws InterruptedException{
+		Thread.sleep(1000);
 		action.sendKeys(Keys.END).perform();
 		//Verify PowerTracker Header
 		String environment = properties.getProperty("Environment");
@@ -1174,47 +1197,53 @@ public class ViewBill extends ReusableLibrary{
 					ViewBillPageObjects.lnk_Hereshow.getObjectName()
 					);
 			driver.navigate().to(currentURL);
+			Thread.sleep(1000);
 		}
 	}
 	
-	public void verifyResidentialRightPromoMessage() throws IOException, InterruptedException{
+	private void verifyResidentialRightPromoMessage() throws InterruptedException{
+		Thread.sleep(3000);
 		action.sendKeys(Keys.END).perform();
+		//Verify Right Promotional Message Header
 		String environment = properties.getProperty("Environment");
-		//Verify Residential Header
-		if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ResidentialHeader.getLocatorType().toString(), 
-				ViewBillPageObjects.lbl_ResidentialHeader.getProperty(), ViewBillPageObjects.lbl_ResidentialHeader.getObjectName()))
-			commonFunction.verifyElementPresentEqualsText(getPageElement(ViewBillPageObjects.lbl_ResidentialHeader), 
-					ViewBillPageObjects.lbl_ResidentialHeader.getObjectName(), commonFunction.getData("General_Data", "Res_Right_Header","Residential Right Header",true));
-		
-		//Verify Dollar Image
-		if(commonFunction.isElementPresent(ViewBillPageObjects.img_DollarImage.getLocatorType().toString(),
-				ViewBillPageObjects.img_DollarImage.getProperty(), ViewBillPageObjects.img_DollarImage.getObjectName(), true)){
-			//Verify Image Source
-			commonFunction.verifyImageSource(getPageElement(ViewBillPageObjects.img_DollarImage),
-					commonFunction.getData(properties.getProperty("Environment"),"General_Data", "DollarImageURL","Dollar Image URL",true),
-					ViewBillPageObjects.img_CheckImage.getObjectName());
+		if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ResidentialRightHeader.getLocatorType().toString(), 
+				ViewBillPageObjects.lbl_ResidentialRightHeader.getProperty(), ViewBillPageObjects.lbl_ResidentialRightHeader.getObjectName())){
+		commonFunction.compareText(commonFunction.getData("General_Data", "Res_Right_Header", "Residential Right Header",true),
+				getPageElement(ViewBillPageObjects.lbl_ResidentialRightHeader).getText(),ViewBillPageObjects.lbl_ResidentialRightHeader.getObjectName());
 		}
 		
-		//Verify Residential Message
-			if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ResidentialMessage.getLocatorType().toString(), 
-					ViewBillPageObjects.lbl_ResidentialMessage.getProperty(), ViewBillPageObjects.lbl_ResidentialMessage.getObjectName())){				
-			String residentialMessage = getPageElement(ViewBillPageObjects.lbl_ResidentialMessage).getText();
+		//Verify Icon Pointer Image
+		if(commonFunction.isElementPresent(ViewBillPageObjects.img_RightImage.getLocatorType().toString(),
+				ViewBillPageObjects.img_RightImage.getProperty(), ViewBillPageObjects.img_RightImage.getObjectName(), true)){
+			//Verify Image Source
+			commonFunction.verifyImageSource(getPageElement(ViewBillPageObjects.img_RightImage),
+					commonFunction.getData(environment,"General_Data", "PointerImageUrl","Check Image URL",true),
+					ViewBillPageObjects.img_RightImage.getObjectName());
+		}
+		
+		//Verify Right Promotional Message
+		if(commonFunction.verifyIfElementIsPresent(ViewBillPageObjects.lbl_ResidentialRightMessage.getLocatorType().toString(), 
+					ViewBillPageObjects.lbl_ResidentialRightMessage.getProperty(), ViewBillPageObjects.lbl_ResidentialRightMessage.getObjectName())){
+			String powerTrackerMessage = getPageElement(ViewBillPageObjects.lbl_ResidentialRightMessage).getText();
 			commonFunction.compareText(commonFunction.getData("General_Data", "Res_Right_Message","Residential Right Message",true),
-					residentialMessage.substring(0,residentialMessage.length() - 8), ViewBillPageObjects.lbl_ResidentialMessage.getObjectName());
-			}
-				
+					powerTrackerMessage.substring(0, powerTrackerMessage.length() - 8),ViewBillPageObjects.lbl_ResidentialRightMessage.getObjectName());
+			
+		}
 		String currentURL = driver.getCurrentUrl();
 		
+		//See How URL
 		action.sendKeys(Keys.END).perform();
 		if(commonFunction.isElementPresent(ViewBillPageObjects.lnk_Seehow.getLocatorType().toString(), 
-				ViewBillPageObjects.lnk_Seehow.getProperty(), ViewBillPageObjects.lnk_Seehow.getObjectName(),true)){				
+				ViewBillPageObjects.lnk_Seehow.getProperty(), ViewBillPageObjects.lnk_Seehow.getObjectName(),true)){
 			commonFunction.clickAndVerifyUrl(getPageElement(ViewBillPageObjects.lnk_Seehow),
 					commonFunction.getData(environment,"General_Data", "Res_Right_Url","Residential Right URL",true),
 					ViewBillPageObjects.lnk_Seehow.getObjectName()
 					);
 			driver.navigate().to(currentURL);
-		}		
+		}
 	}
+	
+	
 	
 	/***********************************************************
 	 * verifyCommercialLeftMessage

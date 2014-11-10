@@ -162,9 +162,9 @@ public enum ViewBillPageObjects {
 	lbl_PowertrackerMessage("#footerMsgDiv > #footerMessagesCenter > #centerMessageTable > tbody > #row_x > #centerMessageTable_MSG_LINE_2 > p",CSS,"Residential Center  Message"),
 	lnk_Hereshow("Here's how",LINKTEXT,"Here's how Link"),
 	
-	lbl_ResidentialHeader("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_MSG_LINE_1",CSS,"Residential Right Header"),
-	img_DollarImage("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_IMG_LINE_2 > #img_rightMessageTable_IMG_LINE_2",CSS,"DollarImage"),
-	lbl_ResidentialMessage("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_MSG_LINE_2 > p",CSS,"Residential Right Message"),
+	lbl_ResidentialRightHeader("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_MSG_LINE_1",CSS,"Residential Right Header"),
+	img_RightImage("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_IMG_LINE_2 > #img_rightMessageTable_IMG_LINE_2",CSS,"DollarImage"),
+	lbl_ResidentialRightMessage("#footerMsgDiv > #footerMessagesRight > #rightMessageTable > tbody > #row_x > #rightMessageTable_MSG_LINE_2 > p",CSS,"Residential Right Message"),
 	lnk_Seehow("See how",LINKTEXT,"See how Link"),
 	
 	//Promotional Messages Commercial
