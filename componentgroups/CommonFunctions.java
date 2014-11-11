@@ -63,11 +63,10 @@ import supportlibraries.ReusableLibrary;
 import supportlibraries.ScriptHelper;
 import supportlibraries.WebDriverFactory;
 
-import bsh.ParseException;
-
 import com.cognizant.framework.FrameworkException;
 import com.cognizant.framework.Status;
 import com.thoughtworks.selenium.Wait;
+import bsh.ParseException;
 //import com.thoughtworks.selenium.webdriven.WebDriverBackedSelenium;
 
 @SuppressWarnings("unused")
@@ -85,31 +84,6 @@ public class CommonFunctions extends ReusableLibrary{
 	private void assertTrue(boolean textPresent){
 		
 	}
-	
-	/*******************************************************
-	 * Function to Check whether Frame is present ON web page or not
-	 * @param frameId
-	 * @return
-	 * ******************************************************
-	 */
-	public boolean isFramePresent(String frameId)
-	{
-		try {
-				WebElement frame = driver.findElement(By.id(frameId));
-			    if(frame.isDisplayed())
-			    {
-			    	return true;
-			    }
-			    else
-			    {
-			    	return false;
-			    }
-		    } 
-	    catch (NoSuchElementException e) 
-	    	{
-				return false;
-	    	}
-	}	
 	
 	/*******************************************************
 	 * Function to check whether Element is present on page
@@ -130,7 +104,6 @@ public class CommonFunctions extends ReusableLibrary{
 			return false;
 		}
 	}
-	
 	
 	/**
 	 * Verify if element is present on page
@@ -163,14 +136,14 @@ public class CommonFunctions extends ReusableLibrary{
 			// Status.PASS);
 
 		} catch(org.openqa.selenium.NoSuchElementException nsee){
-			System.out.println("Exception in isElementPresent:" + nsee);
+			//System.out.println("Exception in isElementPresent:" + nsee);
 			return false;
 		}
 		// Extra protection...
 		if(elemToFind == null){
 			return false;
 		} else{
-			System.out.println("Found element:" + strObjectProperty);
+			//System.out.println("Found element:" + strObjectProperty);
 			return true;
 		}
 	}
@@ -201,7 +174,9 @@ public class CommonFunctions extends ReusableLibrary{
 	 * @return false 
 	 *   	   If the element does not exist on page
 	 *   
-	 * @author 387478  
+	 * @author 387478
+	 * @modifiedby 387478 on 11 Nov
+	 *               added elemToFind.isDisplayed()
 	 ************************************************************* 
 	 */
 	public boolean isElementPresent(String locatorType, String property, String objName, Boolean printError){
@@ -219,7 +194,7 @@ public class CommonFunctions extends ReusableLibrary{
 		    		report.updateTestLog(objName, objName+" element is not displayed", Status.FAIL);
 		        return false;
 		    }
-		    if(elemToFind == null){
+		    if(elemToFind == null || (!elemToFind.isDisplayed())){
 		    	if(printError)
 		    		report.updateTestLog(objName, objName+" element is not displayed", Status.FAIL);
 		    	return false;
@@ -227,43 +202,30 @@ public class CommonFunctions extends ReusableLibrary{
 			return true;
 	}
 	
-	
-	/**
-	 ************************************************************* 
-	 * Function to verify if an element is present in the application, not using
-	 * OR.
-	 * 
-	 * @param strObjectProperty
-	 *            The {@link String} object that contains the page element
-	 *            identification string.
-	 * @param strFindElementType
-	 *            The {@link String} object that describes the method used to
-	 *            identify the element. Possible values are ID, NAME, LINKTEXT,
-	 *            XPATH or CSS.
-	 * @return A boolean value indicating if the searched Element is found.
-	 ************************************************************* 
+	/*******************************************************
+	 * Function to Check whether Frame is present ON web page or not
+	 * @param frameId
+	 * @return
+	 * ******************************************************
 	 */
-	public boolean isElementPresentVerification(WebElement elemToVerify, String strObjName){
-		
-		try{
-			if(elemToVerify.isDisplayed()){
-				//report.updateTestLog((strObjName + " element is present"), strObjName+ " is verified successfully", Status.PASS);
-				return true;
-			} else{
-				report.updateTestLog((strObjName + " element is present"), "'" + strObjName
-						+ "' is NOT displayed", Status.FAIL);
+	public boolean isFramePresent(String frameId)
+	{
+		try {
+				WebElement frame = driver.findElement(By.id(frameId));
+			    if(frame.isDisplayed())
+			    {
+			    	return true;
+			    }
+			    else
+			    {
+			    	return false;
+			    }
+		    } 
+	    catch (NoSuchElementException e) 
+	    	{
 				return false;
-			}
-		} catch(org.openqa.selenium.NoSuchElementException nsee){
-			report.updateTestLog("Error in identifying element (" + strObjName + ")", nsee.toString(), Status.FAIL);
-			return false;
-		} catch(Exception e){
-			report.updateTestLog("IS ELEMENT PRESENT VERIFICATION", "Error in identifying object (" + strObjName
-					+ ") -" + e.toString(), Status.FAIL);
-			return false;
-		}
+	    	}
 	}
-	
 	
 	/**
 	 ************************************************************* 
@@ -279,6 +241,9 @@ public class CommonFunctions extends ReusableLibrary{
 	 *         
 	 * @return false 
 	 *   	   If the element does not exist on page
+	 *   
+	 * @modifiedby 387478 on 11 Nov
+	 *         Added elemToFind.isDisplayed() condition
 	 ************************************************************* 
 	 */
 	public boolean verifyIfElementIsPresent(String strFindElementType, String strObjectProperty, String objName){
@@ -308,106 +273,13 @@ public class CommonFunctions extends ReusableLibrary{
 		    	report.updateTestLog(objName, objName+" element is not displayed", Status.FAIL);
 		        return false;
 		    }
-		    if(elemToFind == null ||(!elemToFind.isDisplayed())){
+		    if(elemToFind == null || (!elemToFind.isDisplayed())){
 		    	report.updateTestLog(objName, objName+" element is not displayed", Status.FAIL);
 		    	return false;
 		    }
-		    if(elemToFind.isDisplayed()){
-			    report.updateTestLog(objName, objName+" is displayed", Status.PASS);	
-				return true;
-		    }else{
-		    	report.updateTestLog(objName, objName+" element is not displayed", Status.FAIL);
-		    	return false;
-		    }
-	}
-	
-	/**
-	 * Method to Verify Element is Not Present For Negative Scenario
-	 * 
-	 * @param elemToVerify
-	 * @param strObjName
-	 */
-
-	public void verifyIsElementNotPresent(String strObjectProperty, String strFindElementType, String strObjName){
-		WebElement element=null;
-		try{
-
-			if(strFindElementType.equalsIgnoreCase("CSS")){
-				element = driver.findElement(By.cssSelector(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("XPATH")){
-				element = driver.findElement(By.xpath(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("ID")){
-				element = driver.findElement(By.id(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("NAME")){
-				element = driver.findElement(By.name(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("LINKTEXT")){
-				element = driver.findElement(By.linkText(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("TAG")){
-				element = driver.findElement(By.tagName(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("CLASS")){
-				element = driver.findElement(By.className(strObjectProperty));
-			} else{
-			}
-			
-			if(element.isDisplayed())
-				report.updateTestLog("verifyIsElementNotPresent - (" + strObjName + ")", "("
-						+ strObjName + ")" + " Is Present!!Not expected", Status.FAIL);
-			else
-				report.updateTestLog("verifyIsElementNotPresent - identifying element (" + strObjName
-						+ ")", "(" + strObjName + ") is NOT PRESENT as expected", Status.PASS);
-			
-
-		} catch(org.openqa.selenium.NoSuchElementException nsee){
-			report.updateTestLog("verifyIsElementNotPresent - identifying element (" + strObjName
-					+ ")", "(" + strObjName + ") is NOT PRESENT as expected", Status.PASS);
-		}
-
-	}
-	
-	
-	/**
-	 * Method to Verify Element is Not Present within a parent element -
-	 * Negative Scenario
-	 * 
-	 * @param elemToVerify
-	 * @param strObjName
-	 */
-	public boolean verifyIsElementNotPresent(WebElement elmt, String strParentElementName, String strObjectProperty,
-			String strFindElementType, String strObjName){
-	
-		try{
-
-			if(strFindElementType.equalsIgnoreCase("CSS")){
-				elmt.findElement(By.cssSelector(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("XPATH")){
-				elmt.findElement(By.xpath(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("ID")){
-				elmt.findElement(By.id(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("NAME")){
-				elmt.findElement(By.name(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("LINKTEXT")){
-				elmt.findElement(By.linkText(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("TAG")){
-				elmt.findElement(By.tagName(strObjectProperty));
-			} else if(strFindElementType.equalsIgnoreCase("CLASS")){
-				elmt.findElement(By.className(strObjectProperty));
-			} else{
-			}
-			report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - (" + strObjName + ")", "("
-					+ strObjName + ")" + " Is Present with property : " + strObjectProperty + " within the Element "
-					+ strParentElementName + "!!Not expected", Status.FAIL);
-			return false;
-
-		} catch(org.openqa.selenium.NoSuchElementException nsee){
-			report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - identifying element (" + strObjName
-					+ ")", "(" + strObjName + ")" + " with property: " + strObjectProperty
-					+ " Is Not Present within the Element " + strParentElementName + " as expected", Status.PASS);
+		    report.updateTestLog(objName, objName+" is displayed", Status.PASS);	
 			return true;
-		}
 	}
-	
-	
-	
 	
 	/**
 	 ************************************************************* 
@@ -427,8 +299,6 @@ public class CommonFunctions extends ReusableLibrary{
 	 * 		  No error message is displayed if  false is passed
 	 *            
 	 * @return String
-	 * 
-	 * @author 387478
 	 * 			
 	 ************************************************************* 
 	 */
@@ -436,93 +306,21 @@ public class CommonFunctions extends ReusableLibrary{
 	{
 		String retrievedData ="";
 		String defaultValue ="BLANK";
-
-		if(!objName.isEmpty()){
-			if(objName.equals("Account Balance"))
-				defaultValue = "Zero";
-			
-			if(objName.equals("Ami"))
-				defaultValue = "Yes";
-			
-			}
-		
+		if(objName.equals("Account Balance"))
+			defaultValue = "Zero";
 		try{
 			retrievedData =  dataTable.getData(sheetName, columnName);
 			//retrievedData =  dataTable.getData("Accounts", "AccountNumber");
-			if(displayError){
-				if(retrievedData.isEmpty())
-					report.updateTestLog("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column. Setting it to " + defaultValue +" by default.", Status.WARNING);					
+			if(retrievedData.isEmpty()){
+				if(displayError)
+					report.updateTestLog("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column. Setting it to " + defaultValue +" by default.", Status.WARNING);
 			}
 		}catch(Exception e){
 			if(displayError)
-				report.updateTestLog(objName, "Unable to retrieve data from Common Data", Status.WARNING);
+				report.updateTestLog(objName, "Unable to retrieve data", Status.WARNING);
 		}
-		if(retrievedData.isEmpty()){
-			if(objName.equals("Account Balance"))
-				retrievedData = "0";
-			
-			if(objName.equals("Ami"))
-				retrievedData = "Yes";
-		}
-		return retrievedData.trim();
+		return retrievedData;
 	}
-	
-	/**
-	 ************************************************************* 
-	 * Function to convert date from Apr 04, 2014 to Apr 4, 2014
-	 * 
-	 * @author 387478
-	 ************************************************************* 
-	 */
-	public String convertDatetoSingleDigit(String inputdate) throws ParseException{
-		
-		SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy");
-		try{
-			Date date = formatter.parse(inputdate);
-			String output = new SimpleDateFormat("MMM d, yyyy").format(date);
-			return output;
-		}catch(Exception e){
-			return "";
-		}
-		
-	}
-	
-	/**
-	 ************************************************************* 
-	 * Function to verify source of image
-	 * 
-	 * @param element
-	 *        Element from which src is to be extracted
-	 *         
-	 * @param expectedSource
-	 *		  Expected value of src Attribute
-	 *
-	 *@param objName
-	 *       Name of the object to be updated in Test Log
-	 * @author 387478
-	 * @modified_by Shabbir on 31 Oct
-	 * 				
-	 * 			
-	 * @return void
-	 ************************************************************* 
-	 */
-	
-	public void verifyImageSource(WebElement element,String expectedSource, String objName){
-		String actualSource="";
-		try{
-			actualSource = element.getAttribute("src");
-			if(actualSource.equals(expectedSource))
-				report.updateTestLog("Verify "+objName+" Image", "Verification is success. Image points to correct source.",
-						Status.PASS);
-			else 
-				report.updateTestLog("Verify "+objName+" Image", "Verification Failure. Expected Source:"+ expectedSource+". Actual Source:"+actualSource,
-						Status.FAIL);
-		}catch(Exception e){
-			report.updateTestLog("Verify "+objName+" Image", "Verification Failure. Expected Source:"+ expectedSource+". Actual Source:"+actualSource,
-					Status.FAIL);
-		}
-	}
-	
 	
 	/**
 	 ************************************************************* 
@@ -578,134 +376,122 @@ public class CommonFunctions extends ReusableLibrary{
 		return retrievedData;
 	}
 	
-	
-	
 	/**
-	 ************************************************************* 
-	 * Function to Retrieve data from dataTable.
+	 * Function to format a amount
+	 * Adds Grouping identifier ','
+	 * Returns a string having two characters after a dot
 	 * 
-	 * @param sheetName
-	 * 		  Sheet from which data is to be retrieved
-	 *            
-	 * @param columnName
-	 * 		  Column from which data is to be retrieved
+	 * @param amount
+	 *            Amount which is to be formatted
+	 * @return string
 	 * 
-	 * @param objName
-	 * 		  Description of the retrieved data which is to be updated in Test Log
-	 * 
-	 * @param displayError
-	 * 		  Displays error message if true is passed and data is blank in sheet
-	 * 		  No error message is displayed if  false is passed
-	 *            
-	 * @return String
-	 * 			
-	 ************************************************************* 
+	 * @author 387478
 	 */
-	public String validateData(String sheetName, String columnName, String objName)
-	{
-		String retrievedData = null;
-		try{
-				retrievedData =  dataTable.getData(sheetName, columnName);
-				if(retrievedData.isEmpty())
-				{	frameworkParameters.setStopExecution(true);
-					throw new FrameworkException("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column in "+ sheetName +" sheet.");
-				}
+	public String formatAmount(String amount){
+		
+		NumberFormat myFormat = NumberFormat.getInstance();
+	      myFormat.setGroupingUsed(true);	
+
+			amount = RemoveSpecialcharactersFromAmount(amount);
+			Double floatamount = Double.parseDouble(amount);
+			floatamount = Math.abs(floatamount); 
+			amount = myFormat.format(floatamount);
+			if(!amount.contains(".")){
+				amount = amount + ".00";
+				return amount;	
 			}
-			catch(Exception e)
-			{
-				frameworkParameters.setStopExecution(true);
-				throw new FrameworkException("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column in "+ sheetName +" sheet.");
-			}
-		return retrievedData;
+			
+			
+			if(amount.split("\\.")[1].length()==1)
+				return amount +"0";
+			
+			return amount;
+				
 	}
 	
-	
 	/**
 	 ************************************************************* 
-	 * Function to clear existing text in a field and enter required data.
+	 * Function to convert date from Apr 04, 2014 to Apr 4, 2014
 	 * 
-	 * @param ElementName
-	 *            The {@link String} object that contains the page element
-	 *            identification variable in OR.
-	 * @param Text
-	 *            The {@link String} object that contains the string to be
-	 *            entered in the text field.
+	 * @author 387478
+	 ************************************************************* 
+	 */
+	public String convertDatetoSingleDigit(String inputdate) throws ParseException{
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy");
+		try{
+			Date date = formatter.parse(inputdate);
+			String output = new SimpleDateFormat("MMM d, yyyy").format(date);
+			return output;
+		}catch(Exception e){
+			return "";
+		}
+		
+	}
+
+	
+     /**
+      ************************************************************* 
+      * Function to verify same text is present in both the input strings
+      * 
+      * @param String expectedString
+      * 
+      * @param String actualString
+      * @param objName
+      *        - Name of the object to be updated in the Test log
+      * 
+      * @author 387478    *   
+      *
+      ************************************************************* 
+       */
+
+      public boolean compareText(String expectedString, String actualString, String objName)
+      {
+            if(expectedString.equals(actualString)){
+                              report.updateTestLog(objName, "'" + objName + "' : " + " Verification is Success", Status.PASS);
+                              return true;
+                        } else{
+                              report.updateTestLog(objName, objName + " : Verification is Failure. Expected : " + expectedString
+                                          + " Actual : " + actualString, Status.FAIL);
+                              return false;
+                        }           
+      }
+	/**
+	 ************************************************************* 
+	 * Function to verify source of image
+	 * 
+	 * @param element
+	 *        Element from which src is to be extracted
+	 *         
+	 * @param expectedSource
+	 *		  Expected value of src Attribute
+	 *
+	 *@param objName
+	 *       Name of the object to be updated in Test Log
+	 * @author 387478
+	 * @modified_by Shabbir on 31 Oct
+	 * 				
+	 * 			
 	 * @return void
 	 ************************************************************* 
 	 */
 	
-	public boolean clearAndEnterText(WebElement elemToUpdate, String strValueToUpdate, String strObjName)
-	{
-		
-		if(!strValueToUpdate.trim().equalsIgnoreCase("IGNORE")){
-			try{
-				if(elemToUpdate.isDisplayed() && elemToUpdate.isEnabled()){
-					elemToUpdate.clear();
-					updateAnyElement(elemToUpdate, strValueToUpdate, strObjName);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is present and update", strObjName
-							+ " is not enabled", Status.FAIL);
-				}
-			} catch(org.openqa.selenium.NoSuchElementException nsee){
-				report.updateTestLog("UPDATE ANY ELEMENT : " + strObjName, strObjName
-						+ " object does not exist in page", Status.FAIL);
-			} catch(Exception e){
-				report.updateTestLog("UPDATE ANY ELEMENT", "Error in finding object - " + strObjName
-						+ ". Error Description - " + e.toString(), Status.FAIL);
-			}
-			return false;
-		} else
-			return true;
+	public void verifyImageSource(WebElement element,String expectedSource, String objName){
+		String actualSource="";
+		try{
+			actualSource = element.getAttribute("src");
+			if(actualSource.equals(expectedSource))
+				report.updateTestLog("Verify "+objName+" Image", "Verification is success. Image points to correct source.",
+						Status.PASS);
+			else 
+				report.updateTestLog("Verify "+objName+" Image", "Verification Failure. Expected Source:"+ expectedSource+". Actual Source:"+actualSource,
+						Status.FAIL);
+		}catch(Exception e){
+			report.updateTestLog("Verify "+objName+" Image", "Verification Failure. Expected Source:"+ expectedSource+". Actual Source:"+actualSource,
+					Status.FAIL);
+		}
 	}
-	
-	/**
-	 ************************************************************* 
-	 * Function to click a given element
-	 * 
-	 * @param elemToClick
-	 *            The {@link strObjProperty} element to be updated
-	 * @param strObjName
-	 *            The {@link strObjName} is used for identifying the object used
-	 *            for reporting purposes.
-	 * @return A boolean value indicating if the searched Element is found.
-	 ************************************************************* 
-	 */
-	public boolean updateAnyElement(WebElement elemToUpdate, String strValueToUpdate, String strObjName){
-		
-		if(!strValueToUpdate.trim().equalsIgnoreCase("IGNORE")){
-			try{
-				if(elemToUpdate.isDisplayed() && elemToUpdate.isEnabled()){
-					// mouseOverWebElement(elemToUpdate); This is NOT supported
-					// in Safari browser. Not required for other browsers too. -
-					// Rajesh 5/27/2013
-					Thread.sleep(1000);
-					try{
-						elemToUpdate.click();
-					} catch(Exception e){
-					}
-					elemToUpdate.clear();
-					elemToUpdate.sendKeys(strValueToUpdate);
-					Thread.sleep(2000);
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is present and updated", strObjName
-							+ " is present and updated with value : " + strValueToUpdate, Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is present and updated", strObjName
-							+ " is not enabled", Status.FAIL);
-				}
-			} catch(org.openqa.selenium.NoSuchElementException nsee){
-				report.updateTestLog("UPDATE ANY ELEMENT : " + strObjName, strObjName
-						+ " object does not exist in page", Status.FAIL);
-			} catch(Exception e){
-				report.updateTestLog("UPDATE ANY ELEMENT", "Error in finding object - " + strObjName
-						+ ". Error Description - " + e.toString(), Status.FAIL);
-			}
-			return false;
-		} else
-			return true;
-	}
-	
+
 	/**
  	 ************************************************************* 
  	 * Function to click a link which opens in same tab and verify
@@ -736,6 +522,7 @@ public class CommonFunctions extends ReusableLibrary{
  		if(driver.getCurrentUrl().equals(expectedUrl)){
  			report.updateTestLog(strObjName, "'" + strObjName + "' : "    + " Verification is Success", Status.PASS);
  			navigateBackFromCurrentPage();
+ 			Thread.sleep(8000);
  			
  		}else{
  			report.updateTestLog(strObjName, strObjName + " : Verification is Failure. Expected Url: " + expectedUrl
@@ -747,7 +534,252 @@ public class CommonFunctions extends ReusableLibrary{
  		return true;
  	}
  	
+ 	/**
+	 ************************************************************* 
+	 * Function to verify text present in an element
+	 * 
+	 * @param Element
+	 *            The {@Webelement Element} object that contains
+	 *            the page element
+	 * 
+	 * @param textToVerify
+	 *            The {@text String} Attribute name of the element which is to
+	 *            be verified
+	 * @return
+	 * @throws InterruptedException 
+	 ************************************************************* 
+	 */
+
+	public boolean verifyLinkInWebPage(WebElement element, String StrObjName,String linkToVerify)	throws IOException, InterruptedException
+	{
+		try
+		{
+				String oldTab = driver.getWindowHandle();
+				element.click();
+				ArrayList<String> newTab = new ArrayList<String>(driver.getWindowHandles());
+			    newTab.remove(oldTab);
+			    
+			    // System.out.println("1."+driver.getCurrentUrl());
+			    
+			    // change focus to new tab
+			    driver.switchTo().window(newTab.get(0));
+			    Thread.sleep(6000); 
+			    
+			    //Thread.sleep(6000); 
+			    if(driver.getCurrentUrl().equals(linkToVerify))
+			    { 
+				    report.updateTestLog(StrObjName, "'" + StrObjName + "' : " 	+ " Verification is Success", Status.PASS);
+					
+			    }
+			    else
+			    {
+			    	report.updateTestLog(StrObjName, StrObjName + " : Verification is Failure. Expected Url: " + linkToVerify
+							+ " Actual : " + driver.getCurrentUrl(), Status.FAIL);
+			    	
+			    }
+			    
+			    // Do what you want here, you are in the new tab
+			    driver.close();
+			    // change focus back to old tab
+			    driver.switchTo().window(oldTab);
+			    return true;
+		} 
+		catch(Exception e)
+		{
+			report.updateTestLog(("Error in method description"), e.toString(), Status.FAIL);
+		}
+	    return false;
+		
+	}
  	
+	/**
+	 ************************************************************* 
+	 * Function to Retrieve data from dataTable.
+	 * 
+	 * @param sheetName
+	 * 		  Sheet from which data is to be retrieved
+	 *            
+	 * @param columnName
+	 * 		  Column from which data is to be retrieved
+	 * 
+	 * @param objName
+	 * 		  Description of the retrieved data which is to be updated in Test Log
+	 * 
+	 * @param displayError
+	 * 		  Displays error message if true is passed and data is blank in sheet
+	 * 		  No error message is displayed if  false is passed
+	 * @author 324096
+	 *            
+	 * @return String
+	 * 			
+	 ************************************************************* 
+	 */
+	public String validateData(String sheetName, String columnName, String objName)
+	{
+		String retrievedData = null;
+		try{
+				retrievedData =  dataTable.getData(sheetName, columnName);
+				if(retrievedData.isEmpty())
+				{	frameworkParameters.setStopExecution(true);
+					throw new FrameworkException("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column in "+ sheetName +" sheet.");
+				}
+			}
+			catch(Exception e)
+			{
+				frameworkParameters.setStopExecution(true);
+				throw new FrameworkException("Retrieve data from "+columnName, objName + " is blank in "+ columnName +" column in "+ sheetName +" sheet.");
+			}
+		return retrievedData;
+	}
+
+	/**
+	 ************************************************************* 
+	 * Function to clear existing text in a field and enter required data.
+	 * 
+	 * @param ElementName
+	 *            The {@link String} object that contains the page element
+	 *            identification variable in OR.
+	 * @param Text
+	 *            The {@link String} object that contains the string to be
+	 *            entered in the text field.
+	 * @return void
+	 ************************************************************* 
+	 */
+	public boolean clearAndEnterText(WebElement elemToEnter, String strValueToUpdate, String strObjName)
+	{
+		
+		if(!strValueToUpdate.trim().equalsIgnoreCase("IGNORE")){
+			try{
+				if(elemToEnter.isDisplayed() && elemToEnter.isEnabled()){
+					elemToEnter.clear();
+					enterValueInElement(elemToEnter, strValueToUpdate, strObjName);
+					return true;
+				} else{
+					report.updateTestLog("Verify if the Element(" + strObjName + ") is present", strObjName
+							+ " is not enabled", Status.FAIL);
+				}
+			} catch(org.openqa.selenium.NoSuchElementException nsee){
+				report.updateTestLog("ENTER VALUE IN ELEMENT : " + strObjName, strObjName
+						+ " object does not exist in page", Status.FAIL);
+			} catch(Exception e){
+				report.updateTestLog("ENTER VALUE IN ELEMENT ", "Error in finding object - " + strObjName
+						+ ". Error Description - " + e.toString(), Status.FAIL);
+			}
+			return false;
+		} else
+			return true;
+	}
+	
+	/**
+	 ************************************************************* 
+	 * Function to verify whether a given Element is present within the page and
+	 * click
+	 * 
+	 * @param strObjProperty
+	 *            The {@link strObjProperty} defines the property value used for
+	 *            identifying the object
+	 * @param strObjPropertyType
+	 *            The {@link strObjPropertyType} describes the method used to
+	 *            identify the element. Possible values are ID, NAME, LINKTEXT,
+	 *            XPATH or CSS.
+	 * @param strObjName
+	 *            The {@link strObjName} is used for identifying the object used
+	 *            for reporting purposes.
+	 * @return A boolean value indicating if the searched Element is found.
+	 * @modified by 3387478 on 11 Nov
+	 ************************************************************* 
+	 */
+	public boolean clickIfElementPresent(WebElement element, String strObjName){
+		
+		try{
+			if(isElementPresentVerification(element, strObjName))
+			{
+				element.click();
+				Thread.sleep(8000);
+				report.updateTestLog("Verify Link & Click", "'"+strObjName +"'"
+						+ " is present and clicked", Status.PASS);
+				return true;
+			} else{
+				report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName +"'"
+						+ " is not present", Status.FAIL);
+				return false;
+			}
+		} catch(Exception e){
+			report.updateTestLog("CLICK IF ELEMENT PRESENT", "Error in method - Error Description - " + e.toString(),
+					Status.FAIL);
+			return false;
+		}
+	}
+	
+	/**
+	 * function to remove special characters in a string
+	 * 
+	 * @param strring
+	 *            to remove the characteres
+	 * @return string
+	 */
+
+	public String RemoveSpecialcharacters(String str){
+		
+		String st = "";
+		for(int i = 0; i < str.length(); i++){
+			int ch = str.charAt(i);
+
+			if((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122) || (ch >= 48 && ch <= 57) || ch==46){
+				st = st + (char) ch;
+			}
+
+		}
+
+		return st;
+	}
+	
+	/**
+	 * Function to remove special characters in a Amount
+	 * It keeps '.' and '-' sign
+	 * 
+	 * @param strring
+	 *            to remove the characteres
+	 * @return string
+	 */
+
+	public String RemoveSpecialcharactersFromAmount(String str){
+			
+			String st = "";
+			for(int i = 0; i < str.length(); i++){
+				int ch = str.charAt(i);
+	
+				if((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122) || (ch >= 48 && ch <= 57) || ch==46 || ch==45){
+					st = st + (char) ch;
+				}
+	
+			}
+	
+			return st;
+		}
+	
+	/**
+	 * Inserts the character ch at the location index of string st
+	 * @param st
+	 * @param ch
+	 * @param index
+	 * @return a new string 
+	 */
+	    public String insertCharAt(String st, char ch, int index){
+	        //1 Exception if st == null
+	        //2 Exception if index<0 || index>st.length()
+
+	        if (st == null){
+	            throw new NullPointerException("Null string!");
+	        }
+
+	        if (index < 0 || index > st.length())
+	        {
+	            throw new IndexOutOfBoundsException("Try to insert at negative location or outside of string");
+	        }
+	        return st.substring(0, index)+ch+st.substring(index, st.length());
+	    }
+	
 	/**
 	 ************************************************************* 
 	 * Method to check/uncheck a checkbox based on the given option
@@ -789,148 +821,6 @@ public class CommonFunctions extends ReusableLibrary{
 		}
 	}
 	
-	
-	
-	
-
-	
-	
-	/**
-     ************************************************************* 
-     * Function to verify same text is present in both the input strings
-     * 
-     * @param String expectedString
-     * 
-     * @param String actualString
-     * @param objName
-     *        - Name of the object to be updated in the Test log
-     * 
-     * @author 387478    *   
-     *
-     ************************************************************* 
-      */
-
-     public boolean compareText(String expectedString, String actualString, String objName)
-     {
-           if(expectedString.equals(actualString)){
-                             report.updateTestLog(objName, "'" + objName + "' : " + " Verification is Success", Status.PASS);
-                             return true;
-                       } else{
-                             report.updateTestLog(objName, objName + " : Verification is Failure. Expected : " + expectedString
-                                         + " Actual : " + actualString, Status.FAIL);
-                             return false;
-                       }           
-     }
-     
-     /**
- 	 * function to remove special characters in a string
- 	 * 
- 	 * @param strring
- 	 *            to remove the characteres
- 	 * @return string
- 	 */
-
- 	public String RemoveSpecialcharacters(String str){
- 		
- 		String st = "";
- 		for(int i = 0; i < str.length(); i++){
- 			int ch = str.charAt(i);
-
- 			if((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122) || (ch >= 48 && ch <= 57) || ch==46 || ch=='$')
- 			{
- 				st = st + (char) ch;
- 			}
-
- 		}
-
- 		return st;
- 	}
-     
-     /**
-  	 ************************************************************* 
-  	 * Function to compare (equals or contains) two strings after removing
-  	 * special characters from them
-  	 * 
-  	 * @param str1
-  	 *            ,str2 The two strings that are to be compared
-  	 * @param strContainsOrEquals
-  	 * 
-  	 * @return Boolean
-  	 ************************************************************* 
-  	 */
-  	public Boolean compareRemovingSpecialCharacters(String str1, String strContainsOrEquals, String str2){
-  		
-  		str1 = RemoveSpecialcharacters(str1.trim().toLowerCase());
-  		str2 = RemoveSpecialcharacters(str2.trim().toLowerCase());
-  		if(strContainsOrEquals.equalsIgnoreCase("equals")){
-  			if(str1.equals(str2))
-  				return true;
-  			else
-  				return false;
-  		} else{
-  			if(str1.contains(str2))
-  				return true;
-  			else
-  				return false;
-  		}
-  	}
-  	
-  	/**
-	 * Function to remove special characters in a Amount
-	 * It keeps '.' and '-' sign
-	 * 
-	 * @param strring
-	 *            to remove the characteres
-	 * @return string
-	 */
-
-public String RemoveSpecialcharactersFromAmount(String str){
-		
-		String st = "";
-		for(int i = 0; i < str.length(); i++){
-			int ch = str.charAt(i);
-
-			if((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122) || (ch >= 48 && ch <= 57) || ch==46 || ch==45){
-				st = st + (char) ch;
-			}
-
-		}
-
-		return st;
-	}
-
-/**
- * Function to format a amount
- * Adds Grouping identifier ','
- * Returns a string having two characters after a dot
- * 
- * @param amount
- *            Amount which is to be formatted
- * @return string
- * 
- * @author 387478
- */
-public String formatAmount(String amount){
-	
-	NumberFormat myFormat = NumberFormat.getInstance();
-      myFormat.setGroupingUsed(true);	
-
-		amount = RemoveSpecialcharactersFromAmount(amount);
-		Double floatamount = Double.parseDouble(amount);
-		floatamount = Math.abs(floatamount); 
-		amount = myFormat.format(floatamount);
-		if(!amount.contains(".")){
-			amount = amount + ".00";
-			return amount;	
-		}
-		
-		
-		if(amount.split("\\.")[1].length()==1)
-			return amount +"0";
-		
-		return amount;
-			
-}
 
 	/**
 	 ************************************************************* 
@@ -986,112 +876,6 @@ public String formatAmount(String amount){
 	}
 	
 	/**
-     ************************************************************* 
-     * Function to verify same text is present in both the input strings
-     * 
-     * @param String expectedString
-     * 
-     * @param String actualString
-     * @param objName
-     *        - Name of the object to be updated in the Test log
-     * 
-     * @author 387478    *   
-     *
-     ************************************************************* 
-      */
-
-     public boolean verifyText(String expectedString, String actualString, String objName)
-     {
-           if(expectedString.equals(actualString)){
-                             report.updateTestLog(objName, "'" + objName + "' : " + " Verification is Success", Status.PASS);
-                             return true;
-                       } else{
-                             report.updateTestLog(objName, objName + " : Verification is Failure. Expected : " + expectedString
-                                         + " Actual : " + actualString, Status.FAIL);
-                             return false;
-                       }           
-     }
-     
-     /**
-      ************************************************************* 
-      * Function to find the Date Difference between two Dates
-      * 
-      * @param String expectedString
-      * 
-      * @param String actualString
-      * @param objName
-      *        - Name of the object to be updated in the Test log
-      * 
-      * @author 387478    *   
-      *
-      ************************************************************* 
-       */
-
-      public long findDateDifference(String dateStart, String dateStop)
-      {
-	    	SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
-	  		Date d1 = null;
-	  		Date d2 = null;
-	  		
-	  		long diff =0;
-	  		long diffDays=0;
-	   		try 
-	  			{
-		  			d1 = format.parse(dateStart);
-		  			d2 = format.parse(dateStop);
-		   			diff = d2.getTime() - d1.getTime();
-		  			diffDays = diff / (24 * 60 * 60 * 1000);
-		    		return diffDays;
-	  			} 
-	  			catch (Exception e) 
-	  			{
-	  				e.printStackTrace();
-	  			}
-	  		return diffDays;
-      }
-     
-	/**
-	 ************************************************************* 
-	 * Function to verify whether a given Element is present within the page and
-	 * click
-	 * 
-	 * @param strObjProperty
-	 *            The {@link strObjProperty} defines the property value used for
-	 *            identifying the object
-	 * @param strObjPropertyType
-	 *            The {@link strObjPropertyType} describes the method used to
-	 *            identify the element. Possible values are ID, NAME, LINKTEXT,
-	 *            XPATH or CSS.
-	 * @param strObjName
-	 *            The {@link strObjName} is used for identifying the object used
-	 *            for reporting purposes.
-	 * @return A boolean value indicating if the searched Element is found.
-	 ************************************************************* 
-	 */
-	public boolean clickIfElementPresent(WebElement element, String strObjName){
-		
-		try{
-			if(isElementPresentVerification(element, strObjName))
-			{
-				element.click();
-				Thread.sleep(8000);
-				report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName +"'"
-						+ " is present and clicked", Status.PASS);
-				return true;
-			} else{
-				report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName +"'"
-						+ " is not present", Status.FAIL);
-				return false;
-			}
-		} catch(Exception e){
-			report.updateTestLog("CLICK IF ELEMENT PRESENT", "Error in method - Error Description - " + e.toString(),
-					Status.FAIL);
-			return false;
-		}
-	}
-
-
-	/**
 	 ************************************************************* 
 	 * Function to return attibute value
 	 * 
@@ -1115,135 +899,35 @@ public String formatAmount(String amount){
 		}
 	}
 
-	
-
 	/**
-	 * Method to execute PDB sql queries
+	 ************************************************************* 
+	 * Function to compare (equals or contains) two strings after removing
+	 * special characters from them
 	 * 
-	 * @param strQuery
-	 *            - SQL query to be executed
-	 * @return record set for executed query
-	 * @throws SQLException
+	 * @param str1
+	 *            ,str2 The two strings that are to be compared
+	 * @param strContainsOrEquals
+	 * 
+	 * @return Boolean
+	 ************************************************************* 
 	 */
-	public ResultSet exeuctePDBQuery(String strQuery) throws SQLException{
+	public Boolean compareRemovingSpecialCharacters(String str1, String strContainsOrEquals, String str2){
 		
-		Connection connection = null;
-		Statement st;
-		ResultSet rs;
-		String strServer, strDatabase;
-		strServer = properties.getProperty("PDBServer");
-		if(strQuery.toLowerCase().contains("web_")){
-			strDatabase = properties.getProperty("WebDatabase");
+		str1 = RemoveSpecialcharacters(str1.trim().toLowerCase());
+		str2 = RemoveSpecialcharacters(str2.trim().toLowerCase());
+		if(strContainsOrEquals.equalsIgnoreCase("equals")){
+			if(str1.equals(str2))
+				return true;
+			else
+				return false;
 		} else{
-			strDatabase = properties.getProperty("PDBDatabase");
-		}
-		try{
-			Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-			connection = DriverManager.getConnection("jdbc:odbc:Driver={SQL Server};SERVER=" + strServer
-					+ ";Trusted_connection=yes;DATABASE=" + strDatabase);
-			st = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			rs = st.executeQuery(strQuery);
-			return rs;
-		} catch(Exception e){
-			if(connection != null){
-				connection.close();
-			}
-			e.printStackTrace();
-			return null;
+			if(str1.contains(str2))
+				return true;
+			else
+				return false;
 		}
 	}
 
-	/**
-	 * Method to execute WCBE query
-	 * 
-	 * @param strQuery
-	 *            - Query to be triggered
-	 * @return - record set for triggered WCBE SQL query
-	 * @throws SQLException
-	 */
-	public ResultSet exeucteWCBEQuery(String strQuery) throws SQLException{
-
-		Connection connection = null;
-		Statement st;
-		ResultSet rs;
-		String strServer, strDatabase, strPort, strUsername, strPassword;
-		strServer = properties.getProperty("WCBEServer");
-		strDatabase = properties.getProperty("WCBEDBName");
-		strPort = properties.getProperty("WCBEPort");
-		strUsername = properties.getProperty("WCBEUsername");
-		strPassword = properties.getProperty("WCBEPassword");
-		try{
-			Class.forName("com.ibm.db2.jcc.DB2Driver");
-			String url = "jdbc:db2://" + strServer + ":" + strPort + "/" + strDatabase;
-			connection = DriverManager.getConnection(url, strUsername, strPassword);
-			st = connection.createStatement();
-			strQuery = strQuery.replace(";", "");
-			if(strQuery.toLowerCase().startsWith("update") || strQuery.toLowerCase().startsWith("delete")
-					|| strQuery.toLowerCase().startsWith("insert")){
-				st.executeUpdate(strQuery);
-				return null;
-			} else{
-				rs = st.executeQuery(strQuery);
-				return rs;
-			}
-
-		} catch(Exception e){
-			if(!strQuery.startsWith("UPDATE userreg")){
-				if(connection != null){
-					connection.close();
-				}
-				report.updateTestLog("Execute WCBE query", "Query unsuccessful : " + e.getMessage(), Status.FAIL);
-				e.printStackTrace();
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * @description Method to result customer name with time stamp
-	 * @param strCustomUserName
-	 *            - Customer name
-	 * @return String
-	 * @modified_date Dec 4, 2013
-	 */
-	public String generateCustomUserName(String strCustomUserName){
-	
-		String strTimeStamp = getCurrentTimeStamp();
-		return strCustomUserName + strTimeStamp;
-	}
-
-	/**
-	 * @description Method to generate new user name
-	 * @return String
-	 * @modified_date Dec 4, 2013
-	 */
-	public String generateNewUserName(){
-	
-		String strTimeStamp = getCurrentTimeStamp();
-		return "TestUser" + strTimeStamp;
-	}
-
-	/**
-	 * @description Method to generate new email address
-	 * @return String
-	 * @modified_date Dec 4, 2013
-	 */
-	public String generateUpdateEmailAddr(){
-	
-		String strTimeStamp = getCurrentTimeStamp();
-		return "newuser" + strTimeStamp + "@gmail.com";
-	}
-
-	/**
-	 * @description Method to generate new user name
-	 * @return String
-	 * @modified_date Dec 4, 2013
-	 */
-	public String generateUpdateUserName(){
-		
-		String strTimeStamp = getCurrentTimeStamp();
-		return "UpdateUser" + strTimeStamp;
-	}
 
 	/**
 	 ************************************************************* 
@@ -1284,7 +968,6 @@ public String formatAmount(String amount){
 	}
 
 	
-
 	/**
 	 * @description Method to get eastern time
 	 * @return String
@@ -1296,7 +979,6 @@ public String formatAmount(String amount){
 		SimpleDateFormat df = new SimpleDateFormat("E h:mm a '-' zzzz");
 		df.setTimeZone(cal.getTimeZone());
 		String strEasternTimestamp = df.format(cal.getTime());
-		System.out.println(strEasternTimestamp);
 		return strEasternTimestamp;
 	}
 
@@ -1580,7 +1262,6 @@ public String formatAmount(String amount){
 	}
 
 	
-
 	/**
 	 * Method To Get The Window Size
 	 * 
@@ -1593,10 +1274,6 @@ public String formatAmount(String amount){
 		Dimension dimSize = driver.manage().window().getSize();
 		return dimSize;
 	}
-
-	
-
-	
 
 	/**
 	 ************************************************************* 
@@ -1686,7 +1363,42 @@ public String formatAmount(String amount){
 		}
 	}
 	
-	
+
+	/**
+	 ************************************************************* 
+	 * Function to verify if an element is present in the application, not using
+	 * OR.
+	 * 
+	 * @param strObjectProperty
+	 *            The {@link String} object that contains the page element
+	 *            identification string.
+	 * @param strFindElementType
+	 *            The {@link String} object that describes the method used to
+	 *            identify the element. Possible values are ID, NAME, LINKTEXT,
+	 *            XPATH or CSS.
+	 * @return A boolean value indicating if the searched Element is found.
+	 ************************************************************* 
+	 */
+	public boolean isElementPresentVerification(WebElement elemToVerify, String strObjName){
+		
+		try{
+			if(elemToVerify.isDisplayed()){
+				//report.updateTestLog((strObjName + " element is present"), strObjName+ " is verified successfully", Status.PASS);
+				return true;
+			} else{
+				report.updateTestLog((strObjName + " element is present"), strObjName
+						+ " is NOT displayed", Status.FAIL);
+				return false;
+			}
+		} catch(org.openqa.selenium.NoSuchElementException nsee){
+			report.updateTestLog("Error in identifying element (" + strObjName + ")", nsee.toString(), Status.FAIL);
+			return false;
+		} catch(Exception e){
+			report.updateTestLog("IS ELEMENT PRESENT VERIFICATION", "Error in identifying object (" + strObjName
+					+ ") -" + e.toString(), Status.FAIL);
+			return false;
+		}
+	}
 
 	/**
 	 * @description Method to verify if the text in the element has Font-Weight
@@ -1797,19 +1509,15 @@ public String formatAmount(String amount){
 		((JavascriptExecutor) driver).executeScript(code, element);
 
 	}
-
 	
-
 	/**
 	 * @description Method to perform back browser action
 	 * @return Nothing
-	 * @throws InterruptedException 
 	 * @modified_date Dec 9, 2013
 	 */
-	public void navigateBackFromCurrentPage() throws InterruptedException{
+	public void navigateBackFromCurrentPage(){
 		
 		driver.navigate().back();
-		Thread.sleep(8000);
 		
 	}
 
@@ -1840,18 +1548,6 @@ public String formatAmount(String amount){
 		a.click();
 	}
 
-	/**
-	 ************************************************************* 
-	 * Function to get the current Page Load state
-	 * 
-	 * @param none
-	 * @author Ganesh
-	 * @return Boolean
-	 ************************************************************* 
-	 */
-	public boolean pageLoadstate(){
-		return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
-	}
 
 	/**
 	 * @description Method to refresh page
@@ -1862,58 +1558,6 @@ public String formatAmount(String amount){
 		
 		driver.navigate().refresh();
 		//handleFeedback();
-	}
-
-	/**
-	 ************************************************************* 
-	 * Function to read properties file
-	 * 
-	 * @param propertiesFileName
-	 *            The {@link String} object that contains the OR name.
-	 * @param propertyName
-	 *            The {@link String} object that contains the property name to
-	 *            read.
-	 * @return The {@link String} object that contains the property value.
-	 ************************************************************* 
-	 */
-	public String readPropertiesFile(String propertiesFileName, String propertyName){
-		
-		Locale locale = new Locale("en", "US");
-		ResourceBundle bundle = ResourceBundle.getBundle(propertiesFileName, locale);
-		String propertyValue = bundle.getString(propertyName);
-		return propertyValue;
-
-	}
-
-	
-
-	
-	
-	/**
-	 * This method will replace the given query if it has fields <VALUE> with
-	 * the given data
-	 * 
-	 * @param strQuery
-	 *            The query which should be modified before execution. Ex:
-	 *            "Select price from price where SKU='<VALUE>' and zone_id in
-	 *            (select zone_id from zip where zip_prefix='<VALUE>' and
-	 *            zip_suffix='<VALUE>')"
-	 * @param strData
-	 *            Data to be replaced in place of <VALUE> specified in the given
-	 *            query PRECEEDED by '&'. Ex: &14336&m5g&212
-	 * @return
-	 */
-	public String replaceQueryWithValue(String strDTValue, String strScenario){
-		if(strDTValue.toUpperCase().contains("AS400") || strDTValue.toUpperCase().contains("PDB")
-				|| strDTValue.toUpperCase().contains("WCBE")){
-			String[] arrData = strScenario.split("&");
-			for(int i = 1; i < arrData.length; i++){
-				strDTValue = strDTValue.substring(0, strDTValue.indexOf("<VALUE>") + 7).replace("<VALUE>", arrData[i])
-						+ strDTValue.substring(strDTValue.indexOf("<VALUE>") + 7);
-			}
-			return strDTValue;
-		} else
-			return strDTValue;
 	}
 
 	/**
@@ -2133,8 +1777,13 @@ public String formatAmount(String amount){
 					elemToEnter.clear();
 					elemToEnter.sendKeys(strValueToEnter);
 					Thread.sleep(2000);
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName+"'"
-							+ " is present and entered value : " + strValueToEnter, Status.PASS);
+					if(strObjName.equals("UserName") || strObjName.equals("Password") || strObjName.equals("SSN")){
+						report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName+"'"
+								+ " is present and entered value : " + new String(new char[strValueToEnter.length()]).replace("\0", "*" ), Status.PASS);
+					}
+					else
+						report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName+"'"
+								+ " is present and entered value : " + strValueToEnter, Status.PASS);
 					return true;
 				} else{
 					report.updateTestLog("Verify if the Element(" + strObjName + ") is present and value is Entered", strObjName
@@ -2167,325 +1816,15 @@ public String formatAmount(String amount){
 
 	}
 
-	
-
-	/**
-	 ************************************************************* 
-	 * Method to verify an element state based on given input conditions and
-	 * report
-	 * 
-	 * @param elemToVerify
-	 *            The {@link strObjProperty} element to be verified
-	 * @param strElemStateToVerify
-	 *            The {@link strElemStateToVerify} describes the state to be
-	 *            verified which can be either one of
-	 *            ENABLED/SELECTED/VALUE/SELECTED VALUE. Any value to be
-	 *            verified is given as : VALUE-<Value>
-	 * @param strExpValue
-	 *            The {@link strExpValue} corresponds to each state
-	 *            representations of {@link strElemStateToVerify} namely
-	 *            Y/N/<the actual text>
-	 * @param strObjName
-	 *            The {@link strObjName} is used for identifying the object used
-	 *            for reporting purposes.
-	 * @return A boolean value indicating if the searched Element is found.
-	 ************************************************************* 
-	 */
-	public boolean verifyAndReportElementState(WebElement elemToVerify, String strElemStateToVerify,
-			String strExpValue, String strObjName){
-		
-		String strExpStateToReport = " ";
-		String strExpValueToCompare = "", strActValue = "", strActAttribute = "";
-		boolean blnExpValue = true;
-		if((!strExpValue.trim().equalsIgnoreCase("IGNORE")) && (!strElemStateToVerify.trim().contains("IGNORE"))){
-			if(strExpValue.trim().equalsIgnoreCase("N")){
-				strExpStateToReport = " not ";
-				blnExpValue = false;
-			}
-
-			// ****************To verify the element is enabled or
-			// not***********
-			if(strElemStateToVerify.equalsIgnoreCase("ENABLED")){
-				if((elemToVerify.isEnabled() && blnExpValue) || (!elemToVerify.isEnabled() && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "enabled", strObjName + " is" + strExpStateToReport + "enabled", Status.PASS);
-					return true;
-				}
-				// else if ((elemToVerify.isEnabled() &&
-				// strExpValue.trim().equalsIgnoreCase("N")) ||
-				// (!elemToVerify.isEnabled() &&
-				// strExpValue.trim().equalsIgnoreCase("Y")) ){
-				else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "enabled", strObjName + " property do not match as expected : " + strExpStateToReport
-							+ "ENABLED", Status.FAIL);
-					return false;
-				}
-			}
-
-			// ****************To verify the element is displayed or
-			// not***********
-			if(strElemStateToVerify.equalsIgnoreCase("DISPLAYED")){
-				if((elemToVerify.isDisplayed() && blnExpValue) || (!elemToVerify.isDisplayed() && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "displayed", strObjName + " is" + strExpStateToReport + "displayed", Status.PASS);
-					return true;
-				}
-				// else if ((elemToVerify.isEnabled() &&
-				// strExpValue.trim().equalsIgnoreCase("N")) ||
-				// (!elemToVerify.isEnabled() &&
-				// strExpValue.trim().equalsIgnoreCase("Y")) ){
-				else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "displayed", strObjName + " property do not match as expected : " + strExpStateToReport
-							+ "displayed", Status.FAIL);
-					return false;
-				}
-			}
-
-			// ****************To verify the element is selected or
-			// not***********
-			else if(strElemStateToVerify.equalsIgnoreCase("SELECTED")){
-				if((elemToVerify.isSelected() && blnExpValue) || (!elemToVerify.isSelected() && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "selected/checked", strObjName + " is" + strExpStateToReport + "selected", Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "selected/checked", strObjName + " property do not match as expected : "
-							+ strExpStateToReport + "SELECTED", Status.FAIL);
-					return false;
-				}
-			}
-
-			// ****************To verify the element has the exact
-			// value***********
-			else if(strElemStateToVerify.substring(0, 6).equalsIgnoreCase("VALUE-")){
-				strExpValueToCompare = strElemStateToVerify.substring(6).trim();
-				strActValue = elemToVerify.getText().trim();
-				strActValue = RemoveSpecialcharacters(strActValue);
-				strExpValueToCompare = RemoveSpecialcharacters(strExpValueToCompare);
-				if(elemToVerify.getTagName().trim().equalsIgnoreCase("input")){
-					strActAttribute = elemToVerify.getAttribute("value").trim();
-					strActAttribute = RemoveSpecialcharacters(strActAttribute);
-				} else{
-					strActAttribute = "";
-				}
-				if((strActValue.equalsIgnoreCase(strExpValueToCompare) && blnExpValue)
-						|| (!strActValue.equalsIgnoreCase(strExpValue.trim()) && !blnExpValue)
-						|| (strActAttribute.trim().equalsIgnoreCase(strExpValueToCompare.trim()) && blnExpValue)
-						|| (!strActAttribute.trim().equalsIgnoreCase(strExpValueToCompare.trim()) && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ") value is" + strExpStateToReport
-							+ "displayed", strObjName + " value: '" + strExpValueToCompare + "'" + strExpStateToReport
-							+ "displayed as expected", Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") value is" + strExpStateToReport
-							+ "displayed",
-							"Expected: '" + strExpValueToCompare + "' Actual: '" + elemToVerify.getText() + "'",
-							Status.FAIL);
-					return false;
-				}
-			}
-
-			// ****************To verify the element contains the expected
-			// value***********
-			else if(strElemStateToVerify.substring(0, 9).equalsIgnoreCase("CONTAINS-")){
-				strExpValueToCompare = strElemStateToVerify.substring(9).trim();
-				strActValue = elemToVerify.getText().trim();
-				if(elemToVerify.getTagName().trim().equalsIgnoreCase("input")){
-					strActAttribute = elemToVerify.getAttribute("value").trim();
-				} else{
-					strActAttribute = "";
-				}
-				if((strActValue.contains(strExpValueToCompare) && blnExpValue)
-						|| (!strActValue.contains(strExpValue.trim()) && !blnExpValue)
-						|| (strActAttribute.contains(strExpValueToCompare) && blnExpValue)
-						|| (!strActAttribute.contains(strExpValueToCompare) && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ")" + strExpStateToReport
-							+ "contains value", strObjName + " value: '" + strExpValueToCompare + "'"
-							+ strExpStateToReport + "displayed as expected", Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ")" + strExpStateToReport
-							+ "contains value",
-							"Expected: '" + strExpValueToCompare + "' Actual: '" + elemToVerify.getText() + "'",
-							Status.FAIL);
-					return false;
-				}
-
-			}
-
-			// ***************To verify if the selected value of a list/combo
-			// box is same**************
-			else if(strElemStateToVerify.substring(0, 15).equalsIgnoreCase("SELECTED VALUE-")){
-				Select comSelElement = new Select(elemToVerify);
-				strExpValueToCompare = strElemStateToVerify.substring(15).trim();
-				strActValue = comSelElement.getFirstSelectedOption().getText().trim();
-				if((strActValue.contains(strExpValueToCompare) && blnExpValue)
-						|| (!strActValue.contains(strExpValueToCompare.trim()) && !blnExpValue)){
-					report.updateTestLog("Verify if the Element(" + strObjName + ") value is " + strExpStateToReport
-							+ "selected", strObjName + " value: '" + strExpValueToCompare + "' is"
-							+ strExpStateToReport + "selected from list", Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the Element(" + strObjName + ") is" + strExpStateToReport
-							+ "selected", strObjName + " value : " + strExpValueToCompare + " is" + strExpStateToReport
-							+ "SELECTED from list", Status.FAIL);
-					return false;
-				}
-			}
-
-			// ***************To verify if the combo box has the list of given
-			// values**************
-			else if(strElemStateToVerify.substring(0, 15).equalsIgnoreCase("LIST OF VALUES-")){
-				List<String> arExpLst;
-				boolean blnResult = false, blnActCompare = true;
-				List<WebElement> lstOptions = new Select(elemToVerify).getOptions();
-				strExpValueToCompare = strElemStateToVerify.substring(15).trim();
-
-				arExpLst = Arrays.asList(strExpValueToCompare.toLowerCase().split(","));
-				List<String> arActLst = new ArrayList<String>();
-				for(WebElement elemOption : lstOptions){
-					arActLst.add(elemOption.getText().toString().trim().toLowerCase());
-				}
-				for(int i = 0; i < arExpLst.size(); i++){
-					blnActCompare = arActLst.indexOf(arExpLst.get(i).trim()) != -1;
-					if((blnActCompare && blnExpValue) || !(blnActCompare || blnExpValue)){
-						blnResult = true;
-					} else{
-						blnResult = false;
-						break;
-					}
-
-				}
-				if(blnResult){
-					report.updateTestLog("Verify if the list : (" + strObjName + ") " + strExpStateToReport
-							+ "has values", strObjName + " " + strExpStateToReport + " has values : "
-							+ strExpValueToCompare + " as expected in the drop down box", Status.PASS);
-					return true;
-				} else{
-					report.updateTestLog("Verify if the list : (" + strObjName + ") " + strExpStateToReport
-							+ "has values", strObjName + " " + strExpStateToReport + " has values : "
-							+ strExpValueToCompare + " ; Actual: "
-							+ arActLst.toArray(new String[arActLst.size()]).toString(), Status.FAIL);
-					return false;
-				}
-			}
-
-		} else
-			return true;
-		return false;
-	}
-
-	/**
-	 * Function name: verifyElementAttribute Description: To verify an attribute
-	 * of an object Parameters: strPropertyValue - Object property value,
-	 * strPropertyBy - Property type strAttributeName - attribute type,
-	 * strAttributeValue - expected attribute value Developed by: VaibhavS
-	 * */
-	public void verifyElementAttribute(String strPropertyValue, String strPropertyBy, String strObjName,
-			String strAttributeName, String strAttributeValue){
-	
-		String strActualValue = getElementAttribute(strPropertyValue, strPropertyBy, strAttributeName, strObjName);
-		if(strActualValue.equalsIgnoreCase(strAttributeValue)){
-			report.updateTestLog("Attribute Verify", strAttributeName + " attribute for " + strObjName
-					+ " verified as " + strAttributeValue, Status.PASS);
-		} else{
-			report.updateTestLog("Attribute Verify", strAttributeName + " attribute for " + strObjName
-					+ " is not verified.", Status.FAIL);
-		}
-	}
-
-	/**
-	 * Method to verify the positioning of two web elements. Always to compare
-	 * the second element with first element keeping the first element as
-	 * static.
-	 * 
-	 * @param strPositionToVerify
-	 *            Standard values to be given are : LEFT,RIGHT,ABOVE,BELOW
-	 * @param elemStatic
-	 *            This is the element which is set as source of comparison
-	 * @param elemToVerify
-	 *            This is the element which is to be compared (whether this
-	 *            element is above/below/left/right of elemStatic)
-	 * @return boolean returns true if the element is present in required
-	 *         condition
-	 * 
-	 */
-	public boolean verifyElementPositions(WebElement elemStatic, String elemStaticName, String strPositionToVerify,
-			WebElement elemToVerify, String elemToVerifyName){
-		
-		int intElem1LocX, intElem1LocY, intElem2LocX, intElem2LocY, intElem1Width, intElem2Width, intElem1Height, intElem2Height;
-		boolean blnPositionCheck = false;
-		String ErrText = "";
-		intElem1LocX = elemStatic.getLocation().x;
-		intElem1LocY = elemStatic.getLocation().y;
-		intElem2LocX = elemToVerify.getLocation().x;
-		intElem2LocY = elemToVerify.getLocation().y;
-		intElem1Width = elemStatic.getSize().width;
-		intElem2Width = elemToVerify.getSize().width;
-		intElem1Height = elemStatic.getSize().height;
-		intElem2Height = elemToVerify.getSize().height;
-
-		if(strPositionToVerify.equalsIgnoreCase("LEFT")){
-			blnPositionCheck = ((intElem2LocX - (intElem1LocX + intElem1Width)) > -5)
-					|| ((intElem2LocX - (intElem1LocX + intElem1Width)) < 5);
-			if(!blnPositionCheck){
-				ErrText = elemStaticName + " is Not to the Left of " + elemToVerifyName + "." + System.lineSeparator()
-						+ "Expected X coordinate of " + elemToVerifyName + ": > " + (intElem1LocX + intElem1Width)
-						+ " (i.e., X coordinate + Width of " + elemStaticName + ")." + System.lineSeparator()
-						+ "Actual X Coordinate of " + elemToVerifyName + " :" + intElem2LocX;
-			}
-		} else if(strPositionToVerify.equalsIgnoreCase("RIGHT")){
-			blnPositionCheck = ((intElem1LocX - (intElem2LocX + intElem2Width)) > -5)
-					|| ((intElem1LocX - (intElem2LocX + intElem2Width)) < 5);
-			if(!blnPositionCheck){
-				ErrText = elemStaticName + " is Not to the Right of " + elemToVerifyName + "." + System.lineSeparator()
-						+ "Expected X coordinate of " + elemStaticName + ": > " + (intElem2LocX + intElem2Width)
-						+ " (i.e., X coordinate + Width of " + elemToVerifyName + ")." + System.lineSeparator()
-						+ "Actual X Coordinate of " + elemStaticName + " :" + intElem1LocX;
-			}
-		} else if(strPositionToVerify.equalsIgnoreCase("ABOVE")){
-
-			blnPositionCheck = ((intElem2LocY - (intElem1LocY + intElem1Height)) > -5)
-					|| ((intElem2LocY - (intElem1LocY + intElem1Height)) < 5);
-			if(!blnPositionCheck){
-				ErrText = elemStaticName + " is Not Above " + elemToVerifyName + "." + System.lineSeparator()
-						+ "Expected Y coordinate of " + elemToVerifyName + ": > " + (intElem1LocY + intElem1Height)
-						+ " (i.e., Y coordinate + Height of " + elemStaticName + ")." + System.lineSeparator()
-						+ "Actual Y Coordinate of " + elemToVerifyName + " :" + intElem2LocY;
-			}
-
-		} else if(strPositionToVerify.equalsIgnoreCase("BELOW")){
-			blnPositionCheck = ((intElem1LocY - (intElem2LocY + intElem2Height)) > -5)
-					|| ((intElem1LocY - (intElem2LocY + intElem2Height)) < 5);
-			if(!blnPositionCheck){
-				ErrText = elemStaticName + " is Not Below " + elemToVerifyName + "." + System.lineSeparator()
-						+ "Expected Y coordinate of " + elemStaticName + ": > " + (intElem2LocY + intElem2Height)
-						+ " (i.e., Y coordinate + Height of " + elemToVerifyName + ")." + System.lineSeparator()
-						+ "Actual Y Coordinate of " + elemStaticName + " :" + intElem1LocY;
-			}
-		}
-
-		if(blnPositionCheck){
-			report.updateTestLog("verifyElementPositions".toUpperCase(), "The element : " + elemStaticName + " is "
-					+ strPositionToVerify + " the second element : " + elemToVerifyName + " ; as expected.",
-					Status.PASS);
-			return true;
-		} else{
-			report.updateTestLog("verifyElementPositions".toUpperCase(), ErrText, Status.FAIL);
-			return false;
-		}
-	}
-
 	/**
 	 ************************************************************* 
 	 * Function to verify Same text present in an element
 	 * 
-	 * @param Element
+	 * @param WebElement Element
 	 *            The {@Webelement Element} object that contains
 	 *            the page element
+	 *            
+	 * @param StrObjName
 	 * 
 	 * @param textToVerify
 	 *            The {@text String} Attribute name of the element which is to
@@ -2499,10 +1838,7 @@ public String formatAmount(String amount){
 		if(!textToVerify.trim().equalsIgnoreCase("IGNORE")){
 			try{
 				String pageSource = element.getText();
-				String pageSource1 = RemoveSpecialcharacters(pageSource); 
-				String textToVerify1 = RemoveSpecialcharacters(textToVerify);
-				
-				if(pageSource1.equals(textToVerify1))
+				if(pageSource.equals(textToVerify))
 				{
 					report.updateTestLog(StrObjName, "'" + StrObjName + "' : " 	+ " Verification is Success", Status.PASS);
 					return true;
@@ -2557,65 +1893,7 @@ public String formatAmount(String amount){
 		return false;
 	}
 
-	/**
-	 ************************************************************* 
-	 * Function to verify text present in an element
-	 * 
-	 * @param Element
-	 *            The {@Webelement Element} object that contains
-	 *            the page element
-	 * 
-	 * @param textToVerify
-	 *            The {@text String} Attribute name of the element which is to
-	 *            be verified
-	 * @return
-	 * @throws InterruptedException 
-	 ************************************************************* 
-	 */
 
-	public boolean verifyLinkInWebPage(WebElement element, String StrObjName,String linkToVerify)	throws IOException, InterruptedException
-	{
-		try
-		{
-				String oldTab = driver.getWindowHandle();
-				element.click();
-				ArrayList<String> newTab = new ArrayList<String>(driver.getWindowHandles());
-			    newTab.remove(oldTab);
-			    
-			    // change focus to new tab
-			    driver.switchTo().window(newTab.get(0));
-			    Thread.sleep(6000); 
-			   
-			    //System.out.println("Actual  :"+driver.getCurrentUrl());
-			    //System.out.println("Expected:"+linkToVerify);
-			    
-			    if(driver.getCurrentUrl().equals(linkToVerify))
-			    { 
-				    report.updateTestLog(StrObjName, "'" + StrObjName + "' : " 	+ " Verification is Success", Status.PASS);
-					
-			    }
-			    else
-			    {
-			    	report.updateTestLog(StrObjName, StrObjName + " : Verification is Failure. Expected Url: " + linkToVerify
-							+ " Actual : " + driver.getCurrentUrl(), Status.FAIL);
-			    	
-			    }
-			    
-			    // Do what you want here, you are in the new tab
-			    driver.close();
-			    // change focus back to old tab
-			    driver.switchTo().window(oldTab);
-			    return true;
-		} 
-		catch(Exception e)
-		{
-			report.updateTestLog(("Error in method description"), e.toString(), Status.FAIL);
-		}
-	    return false;
-		
-	}
-
-	
 	/***************************************************************
 	 * Function to verify text is not present in an element
 	 * 
@@ -2665,78 +1943,86 @@ public String formatAmount(String amount){
 	}
 
 	/**
-	 ************************************************************* 
-	 * Method to verify an element state based on given input conditions
+	 * Method to Verify Element is Not Present For Negative Scenario
 	 * 
 	 * @param elemToVerify
-	 *            The {@link strObjProperty} element to be verified
-	 * @param strElemStateToVerify
-	 *            The {@link strElemStateToVerify} describes the state to be
-	 *            verified which can be either one of
-	 *            ENABLED/SELECTED/TEXT/SELECTED VALUE
-	 * @param strExpValue
-	 *            The {@link strExpValue} corresponds to each state
-	 *            representations of {@link strElemStateToVerify} namely
-	 *            Y/N/<the actual text>
-	 * @return A boolean value indicating if the searched Element is found.
-	 ************************************************************* 
+	 * @param strObjName
 	 */
-	public boolean verifyElementState(WebElement elemToVerify, String strElemStateToVerify, String strExpValue,
-			String strObjName) throws IOException{
-		
-		boolean blnExpValue = true;
-		if(!strExpValue.trim().equalsIgnoreCase("IGNORE")){
-			if(strExpValue.trim().equalsIgnoreCase("N")){
-				blnExpValue = false;
+
+	public void verifyIsElementNotPresent(String strObjectProperty, String strFindElementType, String strObjName){
+		WebElement element = null;
+		try{
+
+			if(strFindElementType.equalsIgnoreCase("CSS")){
+				element = driver.findElement(By.cssSelector(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("XPATH")){
+				element = driver.findElement(By.xpath(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("ID")){
+				element = driver.findElement(By.id(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("NAME")){
+				element = driver.findElement(By.name(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("LINKTEXT")){
+				element = driver.findElement(By.linkText(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("TAG")){
+				element = driver.findElement(By.tagName(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("CLASS")){
+				element = driver.findElement(By.className(strObjectProperty));
+			} else{
 			}
-			if(strElemStateToVerify.equalsIgnoreCase("ENABLED")){
-				if((elemToVerify.isEnabled() && blnExpValue) || (!elemToVerify.isEnabled() && !blnExpValue))
-					return true;
-			} else if(strElemStateToVerify.equalsIgnoreCase("SELECTED")){
-				if((elemToVerify.isSelected() && blnExpValue) || (!elemToVerify.isSelected() && !blnExpValue))
-					return true;
-			} else if(strElemStateToVerify.equalsIgnoreCase("VALUE")){
-				if((elemToVerify.getText().trim().equalsIgnoreCase(strExpValue.trim()) && blnExpValue)
-						|| (!elemToVerify.getText().trim().equalsIgnoreCase(strExpValue.trim()) && !blnExpValue))
-					return true;
-			} else if(strElemStateToVerify.equalsIgnoreCase("CONTAINS")){
-				if((elemToVerify.getText().toUpperCase().contains(strExpValue.trim().toUpperCase()) && blnExpValue)
-						|| (!elemToVerify.getText().toUpperCase().contains(strExpValue.trim().toUpperCase()) && !blnExpValue))
-					return true;
-			} else if(strElemStateToVerify.equalsIgnoreCase("SELECTED VALUE")){
-				Select comSelElement = new Select(elemToVerify);
-				if((comSelElement.getFirstSelectedOption().getText().trim().equalsIgnoreCase(strExpValue.trim()) && blnExpValue)
-						|| (!comSelElement.getFirstSelectedOption().getText().trim()
-								.equalsIgnoreCase(strExpValue.trim()) && !blnExpValue))
-					return true;
-			}
+			
+			if(element.isDisplayed())
+				report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - (" + strObjName + ")", "("
+						+ strObjName + ")" + " Is Present with property : " + strObjectProperty
+						+ " Is Present!!Not expected", Status.FAIL);
+
+		} catch(org.openqa.selenium.NoSuchElementException nsee){
+			report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - identifying element (" + strObjName
+					+ ")", "(" + strObjName + ")" + " with property: " + strObjectProperty
+					+ " Is Not Present as expected", Status.PASS);
 		}
-		return false;
+
 	}
 
-	
 	/**
-	 * Inserts the character ch at the location index of string st
-	 * @param st
-	 * @param ch
-	 * @param index
-	 * @return a new string 
+	 * Method to Verify Element is Not Present within a parent element -
+	 * Negative Scenario
+	 * 
+	 * @param elemToVerify
+	 * @param strObjName
 	 */
-	    public String insertCharAt(String st, char ch, int index){
-	        //1 Exception if st == null
-	        //2 Exception if index<0 || index>st.length()
-
-	        if (st == null){
-	            throw new NullPointerException("Null string!");
-	        }
-
-	        if (index < 0 || index > st.length())
-	        {
-	            throw new IndexOutOfBoundsException("Try to insert at negative location or outside of string");
-	        }
-	        return st.substring(0, index)+ch+st.substring(index, st.length());
-	    }
+	public boolean verifyIsElementNotPresent(WebElement elmt, String strParentElementName, String strObjectProperty,
+			String strFindElementType, String strObjName){
 	
+		try{
+
+			if(strFindElementType.equalsIgnoreCase("CSS")){
+				elmt.findElement(By.cssSelector(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("XPATH")){
+				elmt.findElement(By.xpath(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("ID")){
+				elmt.findElement(By.id(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("NAME")){
+				elmt.findElement(By.name(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("LINKTEXT")){
+				elmt.findElement(By.linkText(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("TAG")){
+				elmt.findElement(By.tagName(strObjectProperty));
+			} else if(strFindElementType.equalsIgnoreCase("CLASS")){
+				elmt.findElement(By.className(strObjectProperty));
+			} else{
+			}
+			report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - (" + strObjName + ")", "("
+					+ strObjName + ")" + " Is Present with property : " + strObjectProperty + " within the Element "
+					+ strParentElementName + "!!Not expected", Status.FAIL);
+			return false;
+
+		} catch(org.openqa.selenium.NoSuchElementException nsee){
+			report.updateTestLog("verifyIsElementNotPresent".toUpperCase() + " - identifying element (" + strObjName
+					+ ")", "(" + strObjName + ")" + " with property: " + strObjectProperty
+					+ " Is Not Present within the Element " + strParentElementName + " as expected", Status.PASS);
+			return true;
+		}
+	}
 
 	/**
 	 * Description: Function to validate items in a list
@@ -2833,15 +2119,12 @@ public String formatAmount(String amount){
 		}
 		return false;
 	}
-
-	
-
 	public void verifyTextPresent(String strText) throws Exception{
-		
-		assertTrue(isTextPresent(strText));
-		report.updateTestLog("Text Verification", strText + "The Text is present ", Status.PASS);
-
-	}
+			
+			assertTrue(isTextPresent(strText));
+			report.updateTestLog("Text Verification", strText + "The Text is present ", Status.PASS);
+	
+		}
 
 	public void waitForElementClickable(String xpathVal, long time){
 		
@@ -2969,6 +2252,47 @@ public String formatAmount(String amount){
 		}
 	}
 
+	/**
+	 * Verify if element is present on page
+	 * 
+	 * @param strObjectProperty
+	 *            -
+	 * @param strFindElementType
+	 *            - Element type to search by.
+	 * @return returns true if the element exist, otherwise, false.
+	 */
+	public boolean isElementPresent2(String strObjectProperty, String strFindElementType){
+		WebElement elemToFind = null;
+		try{
+
+			if(strFindElementType.equalsIgnoreCase("CSS"))
+				elemToFind = driver.findElement(By.cssSelector(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("XPATH"))
+				elemToFind = driver.findElement(By.xpath(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("ID"))
+				elemToFind = driver.findElement(By.id(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("NAME"))
+				elemToFind = driver.findElement(By.name(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("LINKTEXT"))
+				elemToFind = driver.findElement(By.linkText(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("TAG"))
+				elemToFind = driver.findElement(By.tagName(strObjectProperty));
+			else if(strFindElementType.equalsIgnoreCase("CLASS"))
+				elemToFind = driver.findElement(By.className(strObjectProperty));
+			// report.updateTestLog("isElementPresent","Expected...",
+			// Status.PASS);
+
+		} catch(org.openqa.selenium.NoSuchElementException nsee){
+			return false;
+		}
+		// Extra protection...
+		if(elemToFind == null){
+			return false;
+		} else{
+			return true;
+		}
+	}
+
 	public boolean isElementPresentInsideElement(WebElement parentElement, String strObjectProperty,
 			String strFindElementType){
 		WebElement elemToFind = null;
@@ -2992,7 +2316,6 @@ public String formatAmount(String amount){
 			// Status.PASS);
 
 		} catch(org.openqa.selenium.NoSuchElementException nsee){
-			System.out.println("Exception in isElementPresent:" + nsee);
 			return false;
 		}
 		// Extra protection...
@@ -3003,6 +2326,45 @@ public String formatAmount(String amount){
 			return true;
 		}
 	}
+	
+	
+	/**
+     ************************************************************* 
+     * Function to find the Date Difference between two Dates
+     * 
+     * @param String expectedString
+     * 
+     * @param String actualString
+     * @param objName
+     *        - Name of the object to be updated in the Test log
+     * 
+     * @author 387478    *   
+     *
+     ************************************************************* 
+      */
+
+     public long findDateDifference(String dateStart, String dateStop)
+     {
+	    	SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+	  		Date d1 = null;
+	  		Date d2 = null;
+	  		
+	  		long diff =0;
+	  		long diffDays=0;
+	   		try 
+	  			{
+		  			d1 = format.parse(dateStart);
+		  			d2 = format.parse(dateStop);
+		   			diff = d2.getTime() - d1.getTime();
+		  			diffDays = diff / (24 * 60 * 60 * 1000);
+		    		return diffDays;
+	  			} 
+	  			catch (Exception e) 
+	  			{
+	  				e.printStackTrace();
+	  			}
+	  		return diffDays;
+     }
 	
 	
 }
