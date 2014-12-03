@@ -1777,7 +1777,7 @@ public class CommonFunctions extends ReusableLibrary{
 					elemToEnter.clear();
 					elemToEnter.sendKeys(strValueToEnter);
 					Thread.sleep(2000);
-					if(strObjName.equals("UserName") || strObjName.equals("Password") || strObjName.equals("SSN")){
+					if(strObjName.equals("Password") || strObjName.equals("SSN")){
 						report.updateTestLog("Verify if the Element(" + strObjName + ") is present", "'"+strObjName+"'"
 								+ " is present and entered value : " + new String(new char[strValueToEnter.length()]).replace("\0", "*" ), Status.PASS);
 					}
